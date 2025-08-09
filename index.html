@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MAX X Strategy | Innovate. Strategize. Lead.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #0d0d0f;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --hover: #f9fafb;
+            --header-h: 64px;
+            --sidebar-w: 320px;
+            --transition: 300ms cubic-bezier(.2, .9, .3, 1);
+            --ease-out: cubic-bezier(0.2, 0.9, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans Arabic', system-ui, -apple-system, Segoe UI, Roboto;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header fixed */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            z-index: 1200;
+            direction: ltr; /* keep internal flow LTR so brand left/controls right */
+            transition: background var(--transition);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            order: 0;
+            margin-right: auto;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .brand-mark {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--text);
+        }
+
+        /* header controls */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            order: 1;
+            margin-left: auto;
+        }
+
+        .header-btn {
+            background: none;
+            border: 0;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            min-height: 40px;
+            transition: color var(--transition), background var(--transition);
+        }
+
+        .header-btn:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .header-btn.login-btn {
+            background: var(--text);
+            color: var(--bg);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 0;
+            transition: background var(--transition);
+        }
+
+        .header-btn.login-btn:hover {
+            background: #374151;
+        }
+
+        /* page layout: wrapper with sidebar + main (flex) */
+        .page-root {
+            display: flex;
+            gap: 0;
+            transition: var(--transition);
+            margin-top: var(--header-h);
+            min-height: calc(100vh - var(--header-h));
+            flex-direction: row; /* Default for LTR */
+        }
+        
+        /* if RTL, place sidebar visually on right */
+        [dir="rtl"] .page-root {
+            flex-direction: row-reverse;
+        }
+        [dir="ltr"] .page-root {
+            flex-direction: row;
+        }
+
+        /* Sidebar: part of flow (not overlay) */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            max-width: var(--sidebar-w);
+            background: var(--bg);
+            border-left: 1px solid var(--border);
+            transition: width 360ms var(--ease-out), min-width 360ms var(--ease-out);
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        /* adjust border side for LTR */
+        [dir="ltr"] .sidebar {
+            border-right: 1px solid var(--border);
+            border-left: none;
+        }
+
+        /* closed state: collapse to zero width (fluid) */
+        .sidebar.closed {
+            width: 0;
+            min-width: 0;
+            max-width: var(--sidebar-w);
+            border: 0;
+        }
+
+        /* Sidebar content */
+        .sidebar-content {
+            padding: 20px 14px;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .menu-item:hover {
+            background: var(--hover);
+        }
+
+        /* Main content: flex grows and will transform when sidebar open */
+        .main {
+            flex: 1;
+            transition: transform 360ms var(--ease-out), filter 360ms, var(--transition);
+            padding: 28px 20px;
+            min-height: calc(100vh - var(--header-h));
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            max-width: 900px;
+            margin: 60px auto 0;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.05;
+        }
+
+        .hero-sub {
+            color: var(--muted);
+            margin-top: 12px;
+            font-size: 1.05rem;
+        }
+
+        .cta {
+            margin-top: 30px;
+            background: var(--text);
+            color: var(--bg);
+            border: 0;
+            padding: 14px 28px;
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Visual effect when sidebar is open: content shifts & scales (pull effect) */
+        [dir="rtl"] .page-root.sidebar-open .main {
+            transform: translateX(-6%) scale(0.985); /* pull slightly opposite to sidebar side */
+            filter: brightness(0.98);
+        }
+
+        /* For LTR, invert translate direction */
+        [dir="ltr"] .page-root.sidebar-open .main {
+            transform: translateX(6%) scale(0.985);
+            filter: brightness(0.98);
+        }
+        
+        /* Mobile adjustments */
+        @media (max-width: 900px) {
+            :root {
+                --sidebar-w: 280px;
+            }
+            [dir="rtl"] .page-root.sidebar-open .main {
+                transform: translateX(-18%) scale(0.96);
+            }
+            [dir="ltr"] .page-root.sidebar-open .main {
+                transform: translateX(18%) scale(0.96);
+            }
+        }
+
+        @media (max-width: 520px) {
+            :root {
+                --sidebar-w: 220px;
+            }
+            .hero-title {
+                font-size: 2rem;
+            }
+            [dir="rtl"] .page-root.sidebar-open .main {
+                transform: translateX(-26%) scale(0.945);
+            }
+            [dir="ltr"] .page-root.sidebar-open .main {
+                transform: translateX(26%) scale(0.945);
+            }
+        }
+
+        /* footer spec (fixed bottom) */
+        .footer-specs {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            padding: 10px 16px;
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+            z-index: 900;
+        }
+
+        /* small accessibility helpers */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="header" role="banner">
+        <div class="header-left" aria-hidden="false">
+            <a href="#" class="brand" id="brandLink">
+                <span>MAX X Strategy</span>
+                <span class="brand-mark" aria-hidden="true">®</span>
+            </a>
+        </div>
+
+        <div class="header-right" role="toolbar" aria-label="main controls">
+            <div class="login-dropdown" style="position:relative">
+                <button class="header-btn login-btn" id="loginBtn">Log In</button>
+                <div class="dropdown-menu" id="loginDropdown" style="position:absolute;top:calc(100% + 8px);right:0;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:6px 0;min-width:180px;box-shadow:0 10px 25px rgba(0,0,0,0.08);display:none;direction:rtl;">
+                    <a class="dropdown-item" href="#" style="display:block;padding:10px 14px;color:var(--text);text-decoration:none">ثبت نام</a>
+                    <a class="dropdown-item" href="#" style="display:block;padding:10px 14px;color:var(--text);text-decoration:none">ورود همکاران</a>
+                    <a class="dropdown-item" href="#" style="display:block;padding:10px 14px;color:var(--text);text-decoration:none">ورود اعضا</a>
+                </div>
+            </div>
+
+            <button class="header-btn lang-btn" id="langToggle" aria-pressed="false" aria-label="Toggle Language">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+            </button>
+            
+            <button class="header-btn search-btn" id="searchBtn" aria-label="search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+            
+            <button class="header-btn menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="sidebar" aria-label="menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Page root contains sidebar + main so sidebar is part of layout -->
+    <div class="page-root" id="pageRoot">
+        <aside class="sidebar" id="sidebar" role="complementary" aria-hidden="false">
+            <div class="sidebar-content">
+                <nav class="sidebar-menu" aria-label="main menu">
+                    <a href="#" class="menu-item" onclick="openNewPage('dashboard')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        <span>داشبورد اصلی</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="openNewPage('projects')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        <span>پروژه‌ها</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="openNewPage('clients')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span>مشتریان</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="openNewPage('reports')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline></svg>
+                        <span>گزارشات</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="openNewPage('settings')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83"></path></svg>
+                        <span>تنظیمات</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="main" id="mainContent" role="main">
+            <div class="container">
+                <section class="hero" aria-labelledby="heroTitle">
+                    <h1 id="heroTitle" class="hero-title">MAX X Strategy</h1>
+                    <p class="hero-sub">استراتژی‌های نوآورانه برای رهبری در آینده کسب‌وکار</p>
+                    <button class="cta" id="ctaPrimary">شروع کنید</button>
+                </section>
+                <!-- demo content so you see the push effect -->
+                <section style="margin-top:40px">
+                    <div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+                        <div style="padding:18px;border:1px solid var(--border);border-radius:10px">نمونه بلاک A</div>
+                        <div style="padding:18px;border:1px solid var(--border);border-radius:10px">نمونه بلاک B</div>
+                        <div style="padding:18px;border:1px solid var(--border);border-radius:10px">نمونه بلاک C</div>
+                        <div style="padding:18px;border:1px solid var(--border);border-radius:10px">نمونه بلاک D</div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div class="footer-specs" id="footerSpecs">
+        VERSION: MAX-X-2024.08.09 — BUILD: PROD-7823.142 — UPTIME: 99.94%
+    </div>
+
+    <script>
+        // Elements
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const pageRoot = document.getElementById('pageRoot');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginDropdown = document.getElementById('loginDropdown');
+        const langToggle = document.getElementById('langToggle');
+        const langText = document.getElementById('langText');
+
+        // initial state: sidebar visible by default on wide screens
+        const mq = window.matchMedia('(min-width:900px)');
+        function setInitialSidebar() {
+            if (mq.matches) {
+                sidebar.classList.remove('closed');
+                pageRoot.classList.remove('sidebar-open');
+                menuToggle.setAttribute('aria-expanded', 'true');
+            } else {
+                // on small screens, start closed
+                sidebar.classList.add('closed');
+                pageRoot.classList.remove('sidebar-open');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        }
+        setInitialSidebar();
+        mq.addEventListener('change', setInitialSidebar);
+
+        // toggle sidebar - KEEP sidebar as part of layout (push)
+        menuToggle.addEventListener('click', () => {
+            const isClosed = sidebar.classList.contains('closed');
+            if (isClosed) {
+                // open
+                sidebar.classList.remove('closed');
+                pageRoot.classList.add('sidebar-open');
+                menuToggle.setAttribute('aria-expanded', 'true');
+            } else {
+                // close
+                sidebar.classList.add('closed');
+                pageRoot.classList.remove('sidebar-open');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // clicking login shows small dropdown
+        loginBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const shown = loginDropdown.style.display === 'block';
+            loginDropdown.style.display = shown ? 'none' : 'block';
+        });
+        document.addEventListener('click', (ev) => {
+            if (!ev.target.closest('.login-dropdown')) loginDropdown.style.display = 'none';
+        });
+
+        // language toggle: switch lang + dir and update UI text, and ensure sidebar side follows dir
+        langToggle.addEventListener('click', () => {
+            const html = document.documentElement;
+            const current = html.getAttribute('lang') || 'fa';
+            if (current === 'fa') {
+                html.setAttribute('lang', 'en');
+                html.setAttribute('dir', 'ltr');
+                document.querySelectorAll('.menu-item span').forEach(s => {
+                    const map = { 'داشبورد اصلی': 'Dashboard', 'پروژه‌ها': 'Projects', 'مشتریان': 'Clients', 'گزارشات': 'Reports', 'تنظیمات': 'Settings' };
+                    if (map[s.textContent]) s.textContent = map[s.textContent];
+                });
+                document.getElementById('heroTitle').textContent = 'MAX X Strategy';
+                document.querySelector('.hero-sub').textContent = 'Innovative strategies for future business leadership';
+                document.getElementById('ctaPrimary').textContent = 'Get Started';
+                document.querySelector('.login-btn').textContent = 'Log In';
+            } else {
+                html.setAttribute('lang', 'fa');
+                html.setAttribute('dir', 'rtl');
+                document.querySelectorAll('.menu-item span').forEach(s => {
+                    const map = { 'Dashboard': 'داشبورد اصلی', 'Projects': 'پروژه‌ها', 'Clients': 'مشتریان', 'Reports': 'گزارشات', 'Settings': 'تنظیمات' };
+                    if (map[s.textContent]) s.textContent = map[s.textContent];
+                });
+                document.getElementById('heroTitle').textContent = 'MAX X Strategy';
+                document.querySelector('.hero-sub').textContent = 'استراتژی‌های نوآورانه برای رهبری در آینده کسب‌وکار';
+                document.getElementById('ctaPrimary').textContent = 'شروع کنید';
+                document.querySelector('.login-btn').textContent = 'Log In';
+            }
+            // After changing dir, ensure the transform/pull direction matches: toggle sidebar-open to force repaint
+            if (!sidebar.classList.contains('closed')) {
+                pageRoot.classList.add('sidebar-open');
+            } else {
+                pageRoot.classList.remove('sidebar-open');
+            }
+        });
+
+        // helper to open pages (demo)
+        function openNewPage(page) {
+            const urls = { 'dashboard': '/dashboard', 'projects': '/projects', 'clients': '/clients', 'reports': '/reports', 'settings': '/settings' };
+            if (urls[page]) window.open(urls[page], '_blank');
+        }
+
+        // Accessibility: close sidebar with Escape on small screens
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (!sidebar.classList.contains('closed')) {
+                    sidebar.classList.add('closed');
+                    pageRoot.classList.remove('sidebar-open');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
