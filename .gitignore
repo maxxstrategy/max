@@ -1,0 +1,19 @@
+# ==== macOS ====
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ==== Node / Sass ====
+node_modules/
+*.log
+*.cache
+.sass-cache/
+*.tmp
+
+# ==== Build / Dist ====
+dist/
+build/
+
+# ==== Others ====
+*.env
+.env.local
