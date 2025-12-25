@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "sharp": "^0.32.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "scripts": {
+    "build-icons": "node tools/build-icons.mjs",
+    "watch-icons": "node tools/watch-icons.mjs",
+    "icons": "npm run build-icons",
+    "icons-watch": "npm run watch-icons"
+  }
+}
